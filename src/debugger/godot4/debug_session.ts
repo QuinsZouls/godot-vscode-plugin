@@ -13,7 +13,7 @@ import { ServerController } from "./server_controller";
 const { Subject } = require("await-notify");
 import fs = require("fs");
 import { SceneTreeProvider } from "./scene_tree/scene_tree_provider";
-import { get_configuration } from "../utils";
+import { get_configuration } from "../../utils";
 
 interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 	address: string;
@@ -389,6 +389,14 @@ export class GodotDebugSession extends LoggingDebugSession {
 		response: DebugProtocol.VariablesResponse,
 		args: DebugProtocol.VariablesArguments
 	) {
+		if (!this.all_scopes) {
+			response.body = {
+				variables: []
+			};
+			this.sendResponse(response);
+			return;
+		}
+
 		let reference = this.all_scopes[args.variablesReference];
 		let variables: DebugProtocol.Variable[];
 
